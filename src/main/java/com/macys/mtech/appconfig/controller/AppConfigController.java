@@ -1,6 +1,5 @@
 package com.macys.mtech.appconfig.controller;
 
-import java.util.Calendar;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -92,6 +91,23 @@ public class AppConfigController {
         return appConfigRepository.save(appConfig);
     }
 
+
+    @PutMapping("/appconfigs/{id}")
+    public AppConfig updateAppConfigById(@PathVariable(value = "id") Long id,
+    		@Valid @RequestBody AppConfig appConfigDetails,
+    		@RequestParam("userName") String userName) {
+        AppConfig appConfig = appConfigRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "id", id));
+
+        appConfig.setConfigValue(appConfigDetails.getConfigValue());
+
+    	MDC.put("UPDATED_BY", userName);
+    	
+        AppConfig updatedAppConfig = appConfigRepository.save(appConfig);
+
+        return updatedAppConfig;
+    }
+
     
     @PutMapping("/appconfigs/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}")
     public AppConfig updateAppConfig(@PathVariable(value = "appName") String appName,
@@ -118,10 +134,10 @@ public class AppConfigController {
 
     @DeleteMapping("/appconfigs/{id}")
     public ResponseEntity<?> deleteAppConfig(@PathVariable(value = "id") Long id) {
-        AppConfig note = appConfigRepository.findById(id)
+        AppConfig appConfig = appConfigRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "id", id));
 
-        appConfigRepository.delete(note);
+        appConfigRepository.delete(appConfig);
 
         return ResponseEntity.ok().build();
     }
