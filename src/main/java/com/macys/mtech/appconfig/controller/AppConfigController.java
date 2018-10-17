@@ -1,5 +1,6 @@
 package com.macys.mtech.appconfig.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -17,6 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.jayway.jsonpath.JsonPath;
 import com.macys.mtech.appconfig.exception.ResourceNotFoundException;
 import com.macys.mtech.appconfig.model.AppConfig;
 import com.macys.mtech.appconfig.repository.AppConfigRepository;
@@ -72,7 +77,7 @@ public class AppConfigController {
     }
     
     
-    @PostMapping("/appconfigs/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}")
+    @PostMapping(path ="/appconfigs/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}", consumes = "application/json", produces = "application/json")
     public AppConfig createAppConfig(@PathVariable(value = "appName") String appName,
     		@PathVariable(value = "moduleName") String module, 
     		@PathVariable(value = "configType") String configType,
@@ -84,7 +89,10 @@ public class AppConfigController {
     	appConfig.setModule(module);
     	appConfig.setConfigType(configType);
     	appConfig.setConfigKey(configKey);
-    	appConfig.setConfigValue(configValue);
+    	
+    	System.out.println("configValue:"+ JsonPath.parse(configValue).jsonString());
+    	
+    	appConfig.setConfigValue(JsonPath.parse(configValue).jsonString());
     	
     	MDC.put("UPDATED_BY", userName);
     	
@@ -99,11 +107,11 @@ public class AppConfigController {
         AppConfig appConfig = appConfigRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "id", id));
 
-        appConfig.setConfigValue(appConfigDetails.getConfigValue());
+        //appConfig.setConfigValue(appConfigDetails.getConfigValue());
 
     	MDC.put("UPDATED_BY", userName);
     	
-        AppConfig updatedAppConfig = appConfigRepository.save(appConfig);
+        AppConfig updatedAppConfig = appConfigRepository.save(appConfigDetails);
 
         return updatedAppConfig;
     }
@@ -124,7 +132,8 @@ public class AppConfigController {
     	appConfig.setModule(module);
     	appConfig.setConfigType(configType);
     	appConfig.setConfigKey(configKey);
-    	appConfig.setConfigValue(configValue);
+
+    	appConfig.setConfigValue(JsonPath.parse(configValue).jsonString());
 
     	MDC.put("UPDATED_BY", userName);
     	
@@ -133,10 +142,13 @@ public class AppConfigController {
     }
 
     @DeleteMapping("/appconfigs/{id}")
-    public ResponseEntity<?> deleteAppConfig(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<?> deleteAppConfig(@PathVariable(value = "id") Long id,
+    		@RequestParam("userName") String userName) {
         AppConfig appConfig = appConfigRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "id", id));
 
+        MDC.put("UPDATED_BY", userName);
+        
         appConfigRepository.delete(appConfig);
 
         return ResponseEntity.ok().build();
