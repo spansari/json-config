@@ -38,12 +38,33 @@ public class AppConfigController {
     public List<AppConfig> getAllAppConfigs() {
         return appConfigRepository.findAll();
     }
+    
+    
+    @GetMapping("/appconfigs/filter")
+    public String getByJsonPath(@RequestParam("jsonPath") String jsonPath) {
+    	List<AppConfig> appConfigs = appConfigRepository.findAll();
+    	
+    	return JsonPath.parse(appConfigs).read(jsonPath);
+    	
+    }
 
     @GetMapping("/appconfigs/{id}")
     public AppConfig getAppConfigById(@PathVariable(value = "id") Long id) {
         return appConfigRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "id", id));
     }
+    
+    @GetMapping("/appconfigs/{id}/filter")
+    public String getByJsonPath(@PathVariable(value = "id") Long id,
+    		@RequestParam("jsonPath") String jsonPath) {
+    	AppConfig appConfig = appConfigRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "id", id));
+    	
+    	return JsonPath.parse(appConfig.getConfigValue()).read(jsonPath);
+    	
+    }
+
+    
 
     @GetMapping("/appconfigs/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}")
     public AppConfig getAppConfigByAppNameAndModuleAndConfigTypeAndConfigKey(@PathVariable(value = "appName") String appName,
