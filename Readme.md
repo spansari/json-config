@@ -1,4 +1,4 @@
-# Spring Boot, MySQL, JPA, Hibernate Rest API Tutorial
+# Spring Boot, MySQL,Envers Spring Data Rest API Tutorial
 
 Build Restful CRUD API for a simple json config application using Spring Boot, Mysql, Spring data, and Envers.
 
@@ -43,19 +43,21 @@ mvn spring-boot:run
 
 The app will start running at <http://localhost:8080>.
 
+Access Swagger-UI at <http://localhost:8080/json-config/swagger-ui.html>
+
 ## Explore Rest APIs
 
 The app defines following CRUD APIs.
 
-    GET /api/appconfigs
+    GET /json-config/api
     
-    POST /api/appconfigs
+    POST /json-config/api
     
-    GET /api/appconfigs/{id}
+    GET /json-config/api/{id}
     
-    PUT /api/appconfigs/{id}
+    PUT /json-config/api/{id}
     
-    DELETE /api/appconfigs/{id}
+    DELETE /json-config/api/{id}
 
 You can test them using postman or any other rest client.
 
