@@ -1,6 +1,5 @@
 package com.macys.mtech.appconfig.controller;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -18,9 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.jayway.jsonpath.JsonPath;
 import com.macys.mtech.appconfig.exception.ResourceNotFoundException;
 import com.macys.mtech.appconfig.model.AppConfig;
@@ -34,13 +30,13 @@ public class AppConfigController {
     @Autowired
     AppConfigRepository appConfigRepository;
 
-    @GetMapping("/appconfigs")
+    @GetMapping("/")
     public List<AppConfig> getAllAppConfigs() {
         return appConfigRepository.findAll();
     }
     
     
-    @GetMapping("/appconfigs/filter")
+    @GetMapping("/filter")
     public String getByJsonPath(@RequestParam("jsonPath") String jsonPath) {
     	List<AppConfig> appConfigs = appConfigRepository.findAll();
     	
@@ -48,13 +44,13 @@ public class AppConfigController {
     	
     }
 
-    @GetMapping("/appconfigs/{id}")
+    @GetMapping("/{id}")
     public AppConfig getAppConfigById(@PathVariable(value = "id") Long id) {
         return appConfigRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "id", id));
     }
     
-    @GetMapping("/appconfigs/{id}/filter")
+    @GetMapping("/{id}/filter")
     public String getByJsonPath(@PathVariable(value = "id") Long id,
     		@RequestParam("jsonPath") String jsonPath) {
     	AppConfig appConfig = appConfigRepository.findById(id)
@@ -66,7 +62,7 @@ public class AppConfigController {
 
     
 
-    @GetMapping("/appconfigs/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}")
+    @GetMapping("/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}")
     public AppConfig getAppConfigByAppNameAndModuleAndConfigTypeAndConfigKey(@PathVariable(value = "appName") String appName,
     		@PathVariable(value = "moduleName") String module, 
     		@PathVariable(value = "configType") String configType,
@@ -75,7 +71,7 @@ public class AppConfigController {
                 .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "appName, module, configType, configKey", appName + module+ configType + configKey));
     }
 
-    @GetMapping("/appconfigs/app/{appName}/module/{moduleName}/configType/{configType}")
+    @GetMapping("/app/{appName}/module/{moduleName}/configType/{configType}")
     public List<AppConfig> getAppConfigByAppNameAndModuleAndConfigType(@PathVariable(value = "appName") String appName,
     		@PathVariable(value = "moduleName") String module, 
     		@PathVariable(value = "configType") String configType) {
@@ -83,7 +79,7 @@ public class AppConfigController {
         		.orElseThrow(() -> new ResourceNotFoundException("AppConfig", "appName, module, configType", appName + module+ configType));
     }
     
-    @GetMapping("/appconfigs/app/{appName}/module/{moduleName}")
+    @GetMapping("/app/{appName}/module/{moduleName}")
     public List<AppConfig> getAppConfigByAppNameAndModule(@PathVariable(value = "appName") String appName,
     		@PathVariable(value = "moduleName") String module) {
         return appConfigRepository.findByAppNameAndModule(appName, module)
@@ -91,14 +87,14 @@ public class AppConfigController {
         		
     }
 
-    @GetMapping("/appconfigs/app/{appName}")
+    @GetMapping("/app/{appName}")
     public List<AppConfig> getAppConfigByAppName(@PathVariable(value = "appName") String appName) {
         return appConfigRepository.findByAppName(appName)
                 .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "appName", appName));
     }
     
     
-    @PostMapping(path ="/appconfigs/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}", consumes = "application/json", produces = "application/json")
+    @PostMapping(path ="/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}", consumes = "application/json", produces = "application/json")
     public AppConfig createAppConfig(@PathVariable(value = "appName") String appName,
     		@PathVariable(value = "moduleName") String module, 
     		@PathVariable(value = "configType") String configType,
@@ -121,14 +117,14 @@ public class AppConfigController {
     }
 
 
-    @PutMapping("/appconfigs/{id}")
+    @PutMapping("/{id}")
     public AppConfig updateAppConfigById(@PathVariable(value = "id") Long id,
     		@Valid @RequestBody AppConfig appConfigDetails,
     		@RequestParam("userName") String userName) {
         AppConfig appConfig = appConfigRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("AppConfig", "id", id));
 
-        //appConfig.setConfigValue(appConfigDetails.getConfigValue());
+        appConfig.setConfigValue(appConfigDetails.getConfigValue());
 
     	MDC.put("UPDATED_BY", userName);
     	
@@ -138,7 +134,7 @@ public class AppConfigController {
     }
 
     
-    @PutMapping("/appconfigs/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}")
+    @PutMapping("/app/{appName}/module/{moduleName}/configType/{configType}/configKey/{configKey}")
     public AppConfig updateAppConfig(@PathVariable(value = "appName") String appName,
     		@PathVariable(value = "moduleName") String module, 
     		@PathVariable(value = "configType") String configType,
@@ -162,7 +158,7 @@ public class AppConfigController {
         return updatedAppConfig;
     }
 
-    @DeleteMapping("/appconfigs/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAppConfig(@PathVariable(value = "id") Long id,
     		@RequestParam("userName") String userName) {
         AppConfig appConfig = appConfigRepository.findById(id)
