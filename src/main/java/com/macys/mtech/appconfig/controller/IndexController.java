@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/appconfig")
 public class IndexController {
 
-    @GetMapping
+    @GetMapping("/ping")
     public String sayHello() {
-    	return "AppConfig Service is working fine";
+    	return "OK: AppConfig Service is working fine";
     }
 }
