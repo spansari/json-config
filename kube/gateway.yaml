@@ -30,4 +30,4 @@ spec:
     - destination:
         host: config-service
         port:
-          number: 8080
+          number: 80
