@@ -29,5 +29,3 @@ spec:
     route:
     - destination:
         host: config-service
-        port:
-          number: 80
